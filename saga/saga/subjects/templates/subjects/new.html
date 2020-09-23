@@ -1,0 +1,496 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Disciplinas | Nova{% endblock %}
+
+{% block extra_head %}
+<script>
+    function colorSelect(color){
+        document.getElementById('color').value=color;
+        document.getElementById('aqua').className='fa fa-circle-o';
+        document.getElementById('blue').className='fa fa-circle-o';
+        document.getElementById('light-blue').className='fa fa-circle-o';
+        document.getElementById('teal').className='fa fa-circle-o';
+        document.getElementById('yellow').className='fa fa-circle-o';
+        document.getElementById('orange').className='fa fa-circle-o';
+        document.getElementById('green').className='fa fa-circle-o';
+        document.getElementById('lime').className='fa fa-circle-o';
+        document.getElementById('red').className='fa fa-circle-o';
+        document.getElementById('purple').className='fa fa-circle-o';
+        document.getElementById('fuchsia').className='fa fa-circle-o';
+        document.getElementById('navy').className='fa fa-circle-o';
+        if(color){
+            document.getElementById(color).className='fa fa-circle';
+        }
+    }
+
+    function slugify(text) {
+        const a = 'àáäâèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
+        const b = 'aaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------'
+        const p = new RegExp(a.split('').join('|'), 'g')
+        return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(p, c =>
+            b.charAt(a.indexOf(c)))     // Replace special chars
+        .replace(/&/g, '-and-')         // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '')             // Trim - from end of text
+    }
+
+    function slugDefine(){
+        slug_name = document.getElementById('id_name').value;
+        slug_final = slugify(slug_name);
+        document.getElementById('id_slug').value=slug_final;
+    }
+
+    function scheduleDefine(schedule_unity){
+        if(document.getElementById('schedule').value == ""){
+            schedule_value = "";
+        }else{
+            schedule_value = "";
+            schedule_value = document.getElementById('schedule').value;
+        }
+ 	    schedule_checked = document.getElementById(schedule_unity).checked;
+        if(schedule_checked){
+  	        schedule_value = schedule_value + schedule_unity;
+        }else{
+  	        schedule_value = schedule_value.replace(schedule_unity, "");
+        }
+        document.getElementById('schedule').value=schedule_value;
+    }
+
+    window.onload = function error(){
+        document.getElementById('note1').value = document.getElementById('id_note1').value;
+        document.getElementById('note2').value = document.getElementById('id_note2').value;
+        document.getElementById('note3').value = document.getElementById('id_note3').value;
+        document.getElementById('note4').value = document.getElementById('id_note4').value;
+        modality_get();
+        document.getElementById('color').value = document.getElementById('id_color').value;
+        color = document.getElementById('id_color').value;
+        colorSelect(color);
+        document.getElementById('observations').value = document.getElementById('id_observations').value;
+        document.getElementById('schedule').value = document.getElementById('id_schedule').value;
+        error_schedule();
+    }
+
+    function modality_get(){
+        if(document.getElementById('id_modality').checked == true){
+            document.getElementById('modality').value = '0';
+            document.getElementById('note3').readOnly=true;
+            document.getElementById('note4').readOnly=true;
+        }else{
+            document.getElementById('modality').value = '1';
+            document.getElementById('note3').readOnly=false;
+            document.getElementById('note4').readOnly=false;
+        }
+    }
+
+    function modality_set(){
+        if(document.getElementById('modality').value == '0'){
+            document.getElementById('id_modality').checked=true;
+            document.getElementById('note3').readOnly=true;
+            document.getElementById('note4').readOnly=true;
+        }else{
+            document.getElementById('id_modality').checked=false;
+            document.getElementById('note3').readOnly=false;
+            document.getElementById('note4').readOnly=false;
+        }
+    }
+
+    function error_schedule(){
+        schedule = document.getElementById('id_schedule').value;
+        for(x=1; x<7; x++){
+            mon = 'm..mon.' + x; tue = 'm..tue.' + x; wed = 'm..wed.' + x; thu = 'm..thu.' + x; fri = 'm..fri.' + x; sat = 'm..sat.' + x; sun = 'm..sun.' + x;
+            if(schedule.match(mon)){document.getElementById(mon).checked=true;}
+            if(schedule.match(tue)){document.getElementById(tue).checked=true;}
+            if(schedule.match(wed)){document.getElementById(wed).checked=true;}
+            if(schedule.match(thu)){document.getElementById(thu).checked=true;}
+            if(schedule.match(fri)){document.getElementById(fri).checked=true;}
+            if(schedule.match(sat)){document.getElementById(sat).checked=true;}
+            if(schedule.match(sun)){document.getElementById(sun).checked=true;}
+        }
+        for(x=1; x<7; x++){
+            mon = 'v..mon.' + x; tue = 'v..tue.' + x; wed = 'v..wed.' + x; thu = 'v..thu.' + x; fri = 'v..fri.' + x; sat = 'v..sat.' + x; sun = 'v..sun.' + x;
+            if(schedule.match(mon)){document.getElementById(mon).checked=true;}
+            if(schedule.match(tue)){document.getElementById(tue).checked=true;}
+            if(schedule.match(wed)){document.getElementById(wed).checked=true;}
+            if(schedule.match(thu)){document.getElementById(thu).checked=true;}
+            if(schedule.match(fri)){document.getElementById(fri).checked=true;}
+            if(schedule.match(sat)){document.getElementById(sat).checked=true;}
+            if(schedule.match(sun)){document.getElementById(sun).checked=true;}
+        }
+        for(x=1; x<5; x++){
+            mon = 'n..mon.' + x; tue = 'n..tue.' + x; wed = 'n..wed.' + x; thu = 'n..thu.' + x; fri = 'n..fri.' + x; sat = 'n..sat.' + x; sun = 'n..sun.' + x;
+            if(schedule.match(mon)){document.getElementById(mon).checked=true;}
+            if(schedule.match(tue)){document.getElementById(tue).checked=true;}
+            if(schedule.match(wed)){document.getElementById(wed).checked=true;}
+            if(schedule.match(thu)){document.getElementById(thu).checked=true;}
+            if(schedule.match(fri)){document.getElementById(fri).checked=true;}
+            if(schedule.match(sat)){document.getElementById(sat).checked=true;}
+            if(schedule.match(sun)){document.getElementById(sun).checked=true;}
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Preencha os campos para cadastrar uma nova disciplina:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'subjects:index' %}">Disciplinas</a></li>
+            <li><a href="{% url 'subjects:new' %}">Nova</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+<div class="modal modal fade" id="modal-help">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa fa-question-circle"></i> Ajuda</h4>
+            </div>
+            <div class="modal-body">
+                <b>Disciplina:</b> insira o nome para identificação da disciplina.<br>
+                <b>Período:</b> insira o período de atividade da disciplina (Ex.: 2016.2).<br>
+                <b>Professor:</b> insira o nome do professor responsável pela disciplina.<br>
+                <b>Turma:</b> insira a turma da disciplina (Ex.: 4.2401.1M).<br>
+                <b>Nível de interesse:</b> insira o nível de interesse pela discipina (Escala de 0 a 10: 0 para interesse mínimo e 10 para interesse máximo).<br>
+                <b>Modalidade:</b> selecione a madalidade da disciplina, anual ou semestral.<br>
+                <b>Cor:</b> selecione a cor para identificação da disciplina no sistema.<br>
+                <b>Notas:</b> insira as notas da disciplina por bimestre. Obs.: valores de 0 a 100.<br>
+                <b>Observações:</b> insira observações sobre a disciplina, fique a vontade para colocar qualquer tipo de informação.<br>
+                <b>Horário de estudo:</b> selecione os horários de aulas da disciplina.<br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   <section class="content">
+        <div class="row">
+            {% if is_valid %}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Sucesso!</h4>
+                A disciplina foi cadastrada com sucesso. Cheque sua <a href="{% url 'subjects:index' %}">lista de disciplinas</a> para acessá-la ou continue adicionando novas.
+            </div>
+            {% endif %}
+            {% if is_valid == False %}
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-ban"></i> Ops...</h4>
+                Algumas informações não puderam ser salvas. Corrija os erros e tente novamente:<br><br>
+                {% for field in form %}
+                    {% if field.errors %}
+                        {{ field.label_tag }}
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Nova</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-help"><i class="fa fa-question-circle"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form enctype="multipart/form-data" action="" method="post" id="subject_form" novalidate>
+                        {% csrf_token %}
+                        <div style="display: none;">
+                            {{ form.modality }}
+                            {{ form.color }}
+                            {{ form.note1 }}
+                            {{ form.note2 }}
+                            {{ form.note3 }}
+                            {{ form.note4 }}
+                            {{ form.observations }}
+                            {{ form.schedule }}
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="box-footer no-padding">
+                                {{ form.name }}<br>
+                                {{ form.slug }}<br>
+                                {{ form.period }}<br>
+                                {{ form.teacher }}<br>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="box-footer no-padding">
+                                {{ form.group }}<br>
+                                {{ form.interest }}<br>
+                                <select id="modality" class="form-control" style="width: 100%" onchange="modality_set();">
+                                    <optgroup label="Modalidade">
+                                    <option value="1">Anual</option>
+                                    <option value="0">Semestral</option>
+                                </select><br>
+                                <li class="info-box-number">
+                                    <div class="btn-group">
+                                        <a class="text-aqua" onclick="colorSelect('aqua')"><i id="aqua" class="fa fa-circle-o"></i></a>
+                                        <a class="text-blue" onclick="colorSelect('blue')"><i id="blue" class="fa fa-circle-o"></i></a>
+                                        <a class="text-light-blue" onclick="colorSelect('light-blue')"><i id="light-blue" class="fa fa-circle-o"></i></a>
+                                        <a class="text-teal" onclick="colorSelect('teal')"><i id="teal" class="fa fa-circle-o"></i></a>
+                                        <a class="text-yellow" onclick="colorSelect('yellow')"><i id="yellow" class="fa fa-circle-o"></i></a>
+                                        <a class="text-orange" onclick="colorSelect('orange')"><i id="orange" class="fa fa-circle-o"></i></a>
+                                        <a class="text-green" onclick="colorSelect('green')"><i id="green" class="fa fa-circle-o"></i></a>
+                                        <a class="text-lime" onclick="colorSelect('lime')"><i id="lime" class="fa fa-circle-o"></i></a>
+                                        <a class="text-red" onclick="colorSelect('red')"><i id="red" class="fa fa-circle-o"></i></a>
+                                        <a class="text-purple" onclick="colorSelect('purple')"><i id="purple" class="fa fa-circle-o"></i></a>
+                                        <a class="text-fuchsia" onclick="colorSelect('fuchsia')"><i id="fuchsia" class="fa fa-circle-o"></i></a>
+                                        <a class="text-navy" onclick="colorSelect('navy')"><i id="navy" class="fa fa-circle-o"></i></a>
+                                        <input type="hidden" value="aqua" id="color" maxlength="10" name="color">
+                                    </div>
+                                </li><br><br>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <input id="note1" class="form-control" type="number" step="1" min="0" max="100" name="note1" placeholder="Nota 01" /><br>
+                            <input id="note2" class="form-control" type="number" step="1" min="0" max="100" name="note2" placeholder="Nota 02" /><br>
+                            <input id="note3" class="form-control" type="number" step="1" min="0" max="100" name="note3" placeholder="Nota 03" /><br>
+                            <input id="note4" class="form-control" type="number" step="1" min="0" max="100" name="note4" placeholder="Nota 04" /><br>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <textarea id="observations" class="form-control" name="observations" rows="9" placeholder="Observações"></textarea><br>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="box-body pad table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Matutino</th>
+                                            <th width="10%"><center>Domingo</center></th>
+                                            <th width="10%"><center>Segunda</center></th>
+                                            <th width="10%"><center>Terça</center></th>
+                                            <th width="10%"><center>Quarta</center></th>
+                                            <th width="10%"><center>Quinta</center></th>
+                                            <th width="10%"><center>Sexta</center></th>
+                                            <th width="10%"><center>Sábado</center></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td><b>07:00 - 07:45</b></td>
+                                            <td align="center"><input id='m..sun.1' onclick="scheduleDefine('m..sun.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.1' onclick="scheduleDefine('m..mon.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.1' onclick="scheduleDefine('m..tue.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.1' onclick="scheduleDefine('m..wed.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.1' onclick="scheduleDefine('m..thu.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.1' onclick="scheduleDefine('m..fri.1')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.1' onclick="scheduleDefine('m..sat.1')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>07:45 - 08:30</b></td>
+                                            <td align="center"><input id='m..sun.2' onclick="scheduleDefine('m..sun.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.2' onclick="scheduleDefine('m..mon.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.2' onclick="scheduleDefine('m..tue.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.2' onclick="scheduleDefine('m..wed.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.2' onclick="scheduleDefine('m..thu.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.2' onclick="scheduleDefine('m..fri.2')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.2' onclick="scheduleDefine('m..sat.2')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>08:50 - 09:35</b></td>
+                                            <td align="center"><input id='m..sun.3' onclick="scheduleDefine('m..sun.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.3' onclick="scheduleDefine('m..mon.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.3' onclick="scheduleDefine('m..tue.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.3' onclick="scheduleDefine('m..wed.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.3' onclick="scheduleDefine('m..thu.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.3' onclick="scheduleDefine('m..fri.3')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.3' onclick="scheduleDefine('m..sat.3')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>09:35 - 10:20</b></td>
+                                            <td align="center"><input id='m..sun.4' onclick="scheduleDefine('m..sun.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.4' onclick="scheduleDefine('m..mon.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.4' onclick="scheduleDefine('m..tue.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.4' onclick="scheduleDefine('m..wed.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.4' onclick="scheduleDefine('m..thu.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.4' onclick="scheduleDefine('m..fri.4')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.4' onclick="scheduleDefine('m..sat.4')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>10:30 - 11:15</b></td>
+                                            <td align="center"><input id='m..sun.5' onclick="scheduleDefine('m..sun.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.5' onclick="scheduleDefine('m..mon.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.5' onclick="scheduleDefine('m..tue.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.5' onclick="scheduleDefine('m..wed.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.5' onclick="scheduleDefine('m..thu.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.5' onclick="scheduleDefine('m..fri.5')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.5' onclick="scheduleDefine('m..sat.5')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>11:15 - 12:00</b></td>
+                                            <td align="center"><input id='m..sun.6' onclick="scheduleDefine('m..sun.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..mon.6' onclick="scheduleDefine('m..mon.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..tue.6' onclick="scheduleDefine('m..tue.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..wed.6' onclick="scheduleDefine('m..wed.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..thu.6' onclick="scheduleDefine('m..thu.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..fri.6' onclick="scheduleDefine('m..fri.6')" type="checkbox"></td>
+                                            <td align="center"><input id='m..sat.6' onclick="scheduleDefine('m..sat.6')" type="checkbox"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Vespertino</th>
+                                            <th width="10%"><center>Domingo</center></th>
+                                            <th width="10%"><center>Segunda</center></th>
+                                            <th width="10%"><center>Terça</center></th>
+                                            <th width="10%"><center>Quarta</center></th>
+                                            <th width="10%"><center>Quinta</center></th>
+                                            <th width="10%"><center>Sexta</center></th>
+                                            <th width="10%"><center>Sábado</center></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td><b>13:00 - 13:45</b></td>
+                                            <td align="center"><input id='v..sun.1' onclick="scheduleDefine('v..sun.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.1' onclick="scheduleDefine('v..mon.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.1' onclick="scheduleDefine('v..tue.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.1' onclick="scheduleDefine('v..wed.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.1' onclick="scheduleDefine('v..thu.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.1' onclick="scheduleDefine('v..fri.1')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.1' onclick="scheduleDefine('v..sat.1')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>13:45 - 14:30</b></td>
+                                            <td align="center"><input id='v..sun.2' onclick="scheduleDefine('v..sun.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.2' onclick="scheduleDefine('v..mon.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.2' onclick="scheduleDefine('v..tue.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.2' onclick="scheduleDefine('v..wed.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.2' onclick="scheduleDefine('v..thu.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.2' onclick="scheduleDefine('v..fri.2')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.2' onclick="scheduleDefine('v..sat.2')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>14:50 - 15:35</b></td>
+                                            <td align="center"><input id='v..sun.3' onclick="scheduleDefine('v..sun.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.3' onclick="scheduleDefine('v..mon.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.3' onclick="scheduleDefine('v..tue.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.3' onclick="scheduleDefine('v..wed.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.3' onclick="scheduleDefine('v..thu.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.3' onclick="scheduleDefine('v..fri.3')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.3' onclick="scheduleDefine('v..sat.3')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>15:35 - 16:20</b></td>
+                                            <td align="center"><input id='v..sun.4' onclick="scheduleDefine('v..sun.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.4' onclick="scheduleDefine('v..mon.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.4' onclick="scheduleDefine('v..tue.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.4' onclick="scheduleDefine('v..wed.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.4' onclick="scheduleDefine('v..thu.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.4' onclick="scheduleDefine('v..fri.4')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.4' onclick="scheduleDefine('v..sat.4')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>16:30 - 17:15</b></td>
+                                            <td align="center"><input id='v..sun.5' onclick="scheduleDefine('v..sun.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.5' onclick="scheduleDefine('v..mon.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.5' onclick="scheduleDefine('v..tue.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.5' onclick="scheduleDefine('v..wed.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.5' onclick="scheduleDefine('v..thu.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.5' onclick="scheduleDefine('v..fri.5')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.5' onclick="scheduleDefine('v..sat.5')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>17:15 - 18:00</b></td>
+                                            <td align="center"><input id='v..sun.6' onclick="scheduleDefine('v..sun.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..mon.6' onclick="scheduleDefine('v..mon.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..tue.6' onclick="scheduleDefine('v..tue.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..wed.6' onclick="scheduleDefine('v..wed.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..thu.6' onclick="scheduleDefine('v..thu.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..fri.6' onclick="scheduleDefine('v..fri.6')" type="checkbox"></td>
+                                            <td align="center"><input id='v..sat.6' onclick="scheduleDefine('v..sat.6')" type="checkbox"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Noturno</th>
+                                            <th width="10%"><center>Domingo</center></th>
+                                            <th width="10%"><center>Segunda</center></th>
+                                            <th width="10%"><center>Terça</center></th>
+                                            <th width="10%"><center>Quarta</center></th>
+                                            <th width="10%"><center>Quinta</center></th>
+                                            <th width="10%"><center>Sexta</center></th>
+                                            <th width="10%"><center>Sábado</center></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td><b>19:00 - 19:45</b></td>
+                                            <td align="center"><input id='n..sun.1' onclick="scheduleDefine('n..sun.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..mon.1' onclick="scheduleDefine('n..mon.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..tue.1' onclick="scheduleDefine('n..tue.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..wed.1' onclick="scheduleDefine('n..wed.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..thu.1' onclick="scheduleDefine('n..thu.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..fri.1' onclick="scheduleDefine('n..fri.1')" type="checkbox"></td>
+                                            <td align="center"><input id='n..sat.1' onclick="scheduleDefine('n..sat.1')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>19:45 - 20:30</b></td>
+                                            <td align="center"><input id='n..sun.2' onclick="scheduleDefine('n..sun.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..mon.2' onclick="scheduleDefine('n..mon.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..tue.2' onclick="scheduleDefine('n..tue.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..wed.2' onclick="scheduleDefine('n..wed.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..thu.2' onclick="scheduleDefine('n..thu.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..fri.2' onclick="scheduleDefine('n..fri.2')" type="checkbox"></td>
+                                            <td align="center"><input id='n..sat.2' onclick="scheduleDefine('n..sat.2')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>20:40 - 21:25</b></td>
+                                            <td align="center"><input id='n..sun.3' onclick="scheduleDefine('n..sun.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..mon.3' onclick="scheduleDefine('n..mon.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..tue.3' onclick="scheduleDefine('n..tue.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..wed.3' onclick="scheduleDefine('n..wed.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..thu.3' onclick="scheduleDefine('n..thu.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..fri.3' onclick="scheduleDefine('n..fri.3')" type="checkbox"></td>
+                                            <td align="center"><input id='n..sat.3' onclick="scheduleDefine('n..sat.3')" type="checkbox"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>21:25 - 22:10</b></td>
+                                            <td align="center"><input id='n..sun.4' onclick="scheduleDefine('n..sun.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..mon.4' onclick="scheduleDefine('n..mon.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..tue.4' onclick="scheduleDefine('n..tue.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..wed.4' onclick="scheduleDefine('n..wed.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..thu.4' onclick="scheduleDefine('n..thu.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..fri.4' onclick="scheduleDefine('n..fri.4')" type="checkbox"></td>
+                                            <td align="center"><input id='n..sat.4' onclick="scheduleDefine('n..sat.4')" type="checkbox"></td>
+                                    </tbody>
+                                </table>
+                                <input type="hidden" id="schedule" name="schedule">
+                            </div>
+                        </div>
+                    <div class="col-md-2 col-sm-3 col-xs-4">
+                        <button style="width: 80px" class="btn btn-block btn-primary" type="submit" value="Salvar" name="_save" onclick="error()">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+   </section>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'adminlte/lib/_main_sidebar.html' %}
+{% load static %}
+
+{% block user_panel %}
+<aside class="sidebar-collapse">
+    {% if user.is_authenticated %}
+        <div class="user-panel">
+            <div class="pull-left image" >
+                <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'images/user.jpeg' %}{% endif %}" class="img-circle" alt="Imagem de {% firstof request.user.first_name request.user.username %}">
+            </div>
+            <div class="pull-left info">
+                <p><a href="{% url 'accounts:account' %}">{% firstof request.user.first_name request.user.username %}</a></p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block nav_heading %}PÁGINAS{% endblock %}
+
+{% block nav_links %}
+{% if user.is_authenticated %}
+    <li>
+        <a href="{% url 'core:home' %}">
+            <i class="fa fa-home"></i> <span>Início</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'subjects:index' %}">
+            <i class="fa fa-pencil"></i> <span>Disciplinas</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'tasks:index' %}">
+            <i class="fa fa-calendar"></i> <span>Tarefas</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'study_time:study_time' %}">
+            <i class="fa fa-circle-o-notch"></i> <span>Horário de Estudo</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'accounts:logout' %}">
+            <i class="fa fa-sign-out"></i> <span>Sair</span>
+        </a>
+    </li>
+    {% else %}
+    <li>
+        <a href="{% url 'accounts:login' %}">
+            <i class="fa fa-sign-in"></i> <span>Entrar</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'accounts:register' %}">
+            <i class="fa fa-cloud-upload"></i> <span>Cadastrar</span>
+        </a>
+    </li>
+    {% endif %}
+    <li>
+{% endblock nav_links %}

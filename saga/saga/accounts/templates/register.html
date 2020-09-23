@@ -1,0 +1,128 @@
+{% extends 'adminlte/base.html' %}
+{% block title %}SAGA | Cadastrar{% endblock %}
+
+{% block extra_head %}
+<script>
+function register(){
+    document.getElementById('id_username').value = document.getElementById('username').value;
+    document.getElementById('id_password1').value = document.getElementById('password1').value;
+    document.getElementById('id_password2').value = document.getElementById('password2').value;
+    document.getElementById('id_first_name').value = document.getElementById('first_name').value;
+    document.getElementById('id_last_name').value = document.getElementById('last_name').value;
+    document.getElementById('id_email').value = document.getElementById('email').value;
+    document.getElementById('id_course').value = document.getElementById('course').value;
+    document.getElementById('id_period').value = document.getElementById('period').value;
+    document.getElementById('id_group').value = document.getElementById('group').value;
+    document.getElementById('id_ira').value = document.getElementById('ira').value;
+    document.getElementById('id_study_time_diary').value = document.getElementById('study_time_diary').value;
+}
+</script>
+{% endblock %}
+
+{% block content_header %}{% endblock %}
+
+{% block content %}
+<div class="login-box">
+    <div class="login-logo">
+        <span class="glyphicon glyphicon-education"></span>
+        <b>SAGA</b>
+        <h3><small>Sistema de Auxílio e Gestão do Aprendizado</small></h3>
+    </div>
+    {% if is_valid == False %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-ban"></i> Ops...</h4>
+            Algumas informações não puderam ser salvas. Corrija os erros e tente novamente:<br><br>
+            {% for field in form %}
+                {% if field.errors %}
+                    {{ field.label_tag }}
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    <br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-ban"></i> Ops...</h4>
+            {{ error }}
+        </div>
+    {% endif %}
+    <div class="login-box-body">
+        {% if token %}
+        <p class="login-box-msg">Dados pessoais:</p>
+        <p><center>{{ form.non_field_errors }}</center></p>
+        <p><ul class="errorlist">{{ form.username.errors }}</ul></p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div style="display: none;">
+                {% for field in form %}
+                    {{ field }}
+                {% endfor %}
+                <input type="text" id="username" class="form-control" value="{{ username }}">
+                <input type="password" id="password1" class="form-control" value="{{ password }}">
+                <input type="password" id="password2" class="form-control" value="{{ password }}">
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" id="first_name" class="form-control" placeholder="Nome" value="{{ first_name }}" autofocus>
+                <span class="glyphicon glyphicon-font form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" id="last_name" class="form-control" placeholder="Sobrenome" value="{{ last_name }}">
+                <span class="glyphicon glyphicon-bold form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="email" id="email" class="form-control" placeholder="E-mail" value="{{ email }}">
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" id="course" class="form-control" placeholder="Curso" value="{{ course }}">
+                <span class="glyphicon glyphicon-star form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="number" id="period" class="form-control" placeholder="Período" value="{{ period }}">
+                <span class="glyphicon glyphicon-sort-by-order form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" id="group" class="form-control" placeholder="Turma">
+                <span class="glyphicon glyphicon-apple form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="number" step="any" id="ira" class="form-control" placeholder="IRA">
+                <span class="glyphicon glyphicon-sort-by-order-alt form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="number" step="any" id="study_time_diary" class="form-control" placeholder="Tempo de estudo diário">
+                <span class="fa fa-clock-o form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-4">
+                    <button type="submit" class="btn btn-primary" onclick="register()" name="button" value="save">Cadastrar</button>
+                </div>
+            </div>
+        </form>
+        {% else %}
+        <p class="login-box-msg">Informe a matrícula e a senha do SUAP.</p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div class="form-group has-feedback">
+                <input type="text" name="username_suap" class="form-control" placeholder="Matrícula" autofocus>
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" name="password_suap" class="form-control" placeholder="Senha">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-4">
+                    <button type="submit" class="btn btn-primary" name="button" value="suap">Avançar</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

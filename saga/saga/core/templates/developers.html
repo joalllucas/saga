@@ -1,0 +1,125 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Desenvolvedores{% endblock %}
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Confira quem ajudou a desenvolver o SAGA:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'core:developers' %}">Desenvolvedores</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+        <div class="row">
+            {% if success %}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Sucesso!</h4>
+                A mensagem foi enviada com sucesso!
+            </div>
+            {% endif %}
+            <div class="box box-primary collapsed-box">
+                <div class="box-header">
+                    <h3 class="box-title">Joao Lucas de Paiva Paulino (2017)</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-md-3">
+                        <div class="box box">
+                            <div class="box-body box-profile">
+                                <img class="profile-user-img img-responsive img-circle" src="{% static 'images/developers/joao_lucas.jpg' %}" alt="User profile picture">
+                                <h3 class="profile-username text-center">Joao Lucas</h3>
+                                <p class="text-muted text-center">Se a vida fosse justa, ela não se chamaria "vida".</p>
+                            </div>
+                        </div>
+                        <div class="box box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Sobre</h3>
+                            </div>
+                            <div class="box-body">
+                                <strong><i class="fa fa-book margin-r-5"></i>Educação</strong>
+                                <p class="text-muted">Técnico em Infomática pelo IFRN</p>
+                                <hr>
+                                <strong><i class="fa fa-map-marker margin-r-5"></i>Localização</strong>
+                                <p class="text-muted">Mossoró, Rio Grande do Norte, Brasil</p>
+                                <hr>
+                                <strong><i class="fa fa-file-text-o margin-r-5"></i>Currículo Lattes</strong>
+                                <a href="http://lattes.cnpq.br/0734105841718449" target="_blank">lattes.cnpq.br/0734105841718449</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#home" data-toggle="tab">Início</a></li>
+                                <li><a href="#contact" data-toggle="tab">Contato</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="active tab-pane" id="home">
+                                    <div class="post">
+                                        <div class="user-block">
+                                            <img class="img-circle img-bordered-sm" src="{% static 'images/developers/joao_lucas.jpg' %}" alt="User Image">
+                                            <span class="username">
+                                                <a>Joao Lucas</a>
+                                            </span>
+                                            <span class="description">Quem é Joao Lucas?</span>
+                                        </div>
+                                        <p>
+                                            <p>Olá, meu nome é Joao Lucas! <i>Antes que você ache que eu não sei escrever o meu próprio
+                                            nome, ele não tem o til (~), é "Joao" mesmo.</i> Pois bem, eu me formei, em 2016, em Informática
+                                            pelo IFRN - Campus Mossoró, mas vim concluir oficialmente o curso apenas no início de 2018,
+                                            quando terminei o SAGA e o apresentei como o meu TCC.</p>
+                                        </p>
+                                    </div>
+                                    <div class="post">
+                                        <div class="user-block">
+                                            <img class="img-circle img-bordered-sm" src="{% static 'images/developers/joao_lucas.jpg' %}" alt="User Image">
+                                            <span class="username">
+                                                <a>Joao Lucas</a>
+                                            </span>
+                                            <span class="description">Por que o SAGA foi criado?</span>
+                                        </div>
+                                        <p>
+                                            O SAGA foi pensado com base em um desejo pessoal. Quando eu elaborava os meus calendários de
+                                            provas, sempre sentia falta de alguns recursos para auxilar na organização do conteúdo. Tendo
+                                            isso em vista, em conjunto com o Professor Doutor <a href="http://lattes.cnpq.br/7568055799308361" target="_blank">Higor Morais</a>,
+                                            foi pensada uma solução para o problema, então o sistema nasceu. Hoje, ele atua como um
+                                            facilitador na vida dos alunos do IFRN que utilizam suas ferramenras para organizar seus
+                                            horários de estudo.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="contact">
+                                    <form enctype="multipart/form-data" method="POST" class="form-horizontal" novalidate>
+                                        {% csrf_token %}
+                                        {% for field in form %}
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                {{ field }}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        <button type="submit" name="button" value="joao_lucas" class="btn btn-primary">Enviar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

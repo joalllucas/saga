@@ -1,0 +1,17 @@
+{% extends 'adminlte/base.html' %}
+
+{% block title %}SAGA | Página não encontrada{% endblock %}
+{% block content %}
+<section class="content">
+    <div class="error-page">
+        <h2 class="headline text-yellow">404</h2>
+        <div class="error-content">
+            <h3><i class="fa fa-warning text-yellow"></i> Ops! Página não encontrada.</h3>
+            <p>
+            Não conseguimos encontrar a página solicitada.
+            Retornar ao <a href="{% url 'core:home' %}">início</a>.
+            </p>
+        </div>
+    </div>
+    </section>
+{% endblock %}

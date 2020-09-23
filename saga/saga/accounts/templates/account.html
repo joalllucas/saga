@@ -1,0 +1,49 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Conta{% endblock %}
+
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Confira as informações cadastradas na sua conta:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'accounts:account' %}">Conta</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="row">
+        <div>
+            <div class="box box-widget widget-user-2">
+                <div class="widget-user-header bg-blue">
+                    <div class="widget-user-image">
+                        <img class="img-circle" src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'images/user.jpeg' %}{% endif %}" alt="Imagem de {% firstof request.user.first_name request.user.username %}">
+                    </div>
+                    <h3 class="widget-user-username">{% firstof request.user.get_full_name request.user.username %}</h3>
+                    <h5 class="widget-user-desc">Aluno do {{ user.period }}º período de {{ user.course }}</h5>
+                </div>
+                <div class="box-footer no-padding">
+                    <ul class="nav nav-stacked">
+                        <li><a>Matrícula: <span class="pull-right badge bg-blue">{{ user.username }}</span></a></li>
+                        <li><a>E-mail: <span class="pull-right badge bg-blue">{{ user.email }}</span></a></li>
+                        <li><a>IRA: <span class="pull-right badge bg-blue">{{ user.ira }}</span></a></li>
+                        <li><a>Turma: <span class="pull-right badge bg-blue">{{ user.group }}</span></a></li>
+                        <li><a>Tempo de estudo diário: <span class="pull-right badge bg-blue">{{ user.study_time_diary }} hora{% if user.study_time_diary >= 2 %}s{% endif %}</span></a></li>
+                        <li><a href="{% url 'accounts:edit' %}"><span class="badge bg-light-blue">Editar</span></a></li>
+                        <li><a href="{% url 'accounts:change_password' %}"><span class="badge bg-light-blue">Alterar senha</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

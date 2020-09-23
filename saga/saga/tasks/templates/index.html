@@ -1,0 +1,267 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Tarefas{% endblock %}
+
+{% block content_header %}
+    <div class="modal modal fade" id="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i id="modal-icon" class=""></i><span id="modal-title"></span></h4>
+                </div>
+                <form enctype="multipart/form-data" action="" method="post" id="subject_form" novalidate>
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div id="modal-fields" class="form-group">
+                            <input class="form-control" id="id_id" name='id' type="hidden">
+                            <input class="form-control" id="id_owner" name='owner' type="hidden" value="{{ user.id }}">
+                            <select id="id_subject" id="subject" name="subject" class="form-control" style="width: 100%" onchange="titleDefine()">
+                                <optgroup label="Disciplina">
+                                    <option value="{{ first_subject.id }}" selected >{{ first_subject.name }}</option>
+                                {% for subject in subjects %}
+                                    {% if subject.id is not first_subject.id %}
+                                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select><br>
+                            <input class="form-control" id="id_evaluation_type" name='evaluation_type' type="text" placeholder="Tipo de avaliação" onchange="titleDefine()" onkeyup="titleDefine()"><br>
+                            <input class="form-control" id="id_title" name='title' type="text" placeholder="Título"><br>
+                            <input type="hidden" id="id_start" name="start" class="form-control">
+                            <input type="hidden" id="id_start_date" name="start_date" class="form-control">
+                            <input type="hidden" id="id_end" name="end" class="form-control">
+                            <input type="hidden" id="id_end_date" name="end_date" class="form-control">
+                            <input class="form-control" id="id_color" name='color' type="hidden">
+                            <textarea class="form-control" type="text" id= "id_description" name="description" rows="4" placeholder="Descrição"></textarea>
+                        </div>
+                        <div id="modal-text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modal-demiss" type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                        <span id="modal-exclude"><button type="button" data-toggle="modal" data-target="#modal-delete" class="btn btn-danger">Excluir</button></span>
+                        <button type="submit" id="submitButton" name="button" value="" class="btn btn-primary" onclick="start_date_define()">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-danger fade" id="modal-delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="icon fa fa-warning"></i> Atenção!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>A ação não poderá ser desfeita. Deseja prosseguir com a exclusão da tarefa?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                    <form enctype="multipart/form-data" action="" method="post" novalidate>
+                        {% csrf_token %}
+                        <input class="form-control" id="id" name='id' type="hidden">
+                        <button type="submit" id="submitButton" name="button" value="exclude" class="btn btn-outline">Excluir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Confira as tarefas cadastradas:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'tasks:index' %}">Tarefas</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    {% if is_valid == False %}
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h4><i class="icon fa fa-ban"></i> Ops...</h4>
+        Algumas informações não puderam ser salvas. Corrija os erros e tente novamente:<br><br>
+        {% for field in form %}
+            {% if field.errors %}
+                {{ field.label_tag }}
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+                <br>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <section class="content">
+        <div class="row">
+            <div class="box box-primary">
+                <div class="box-body no-padding">
+                    {% if subjects %}
+                    <div id='calendar'></div>
+                    {% else %}
+                    <br><center><b>Você não possui disciplinas cadastradas. Cadastre uma para acessar o calendário.</b></center><br>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_foot %}
+    <link href="{% static 'fullcalendar/fullcalendar.css' %}" rel='stylesheet' />
+    <link href="{% static 'fullcalendar/fullcalendar.print.min.css' %}" rel='stylesheet' media='print' />
+    <script src="{% static 'fullcalendar/lib/moment.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/fullcalendar.js' %}"></script>
+    <script src="{% static 'fullcalendar/locale/pt-br.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                lang: 'pt-br',
+                header: {
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'month,basicWeek,basicDay'
+                },
+                themeSystem: 'bootstrap3',
+                selectable: true,
+                selectHelper: true,
+                editable: true,
+                droppable: true,
+                eventLimit: true,
+                allDayDefault: true,
+                events: 'tasks/tasks_feed/',
+
+                select: function (start, end) {
+                    $("#modal-icon").attr('class', 'fa fa-calendar-plus-o');
+                    $("#modal-title").html('  Nova');
+                    $("#modal-fields").attr('class', '');
+                    $("#modal-text").html('');
+                    $("#modal-demiss").attr('onclick', '')
+                    $("#modal-exclude").attr('class', 'hidden');
+
+                    $('#submitButton').val('new');
+                    $('#id_evaluation_type').val('');
+                    $('#id_title').val('');
+                    $('#id_start').val(start);
+                    $('#id_end').val(end);
+                    $('#id_color').val('');
+                    $('#id_description').val('');
+                    $('#modal').modal('show');
+                },
+
+                eventClick: function (event, element) {
+                    $("#modal-icon").attr('class', 'fa fa-calendar-minus-o');
+                    $("#modal-title").html('  Editar');
+                    $("#modal-fields").attr('class', '');
+                    $("#modal-text").html('');
+                    $("#modal-demiss").attr('onclick', '');
+                    $("#modal-exclude").attr('class', '');
+
+                    $('#submitButton').val('edit');
+                    $('#id_id').val(event.id);
+                    $('#id').val(event.id);
+                    $('#id_owner').val(event.owner);
+                    $('#id_subject').val(event.subject);
+                    $('#id_evaluation_type').val(event.evaluation_type);
+                    $('#id_title').val(event.title);
+                    $('#id_start').val(event.start);
+                    $('#id_end').val(event.end);
+                    $('#id_color').val(event.color);
+                    $('#id_description').val(event.description);
+                    $('#modal').modal('show');
+                },
+
+                eventResize: function (event, delta, revertFunc) {
+                    $("#modal-icon").attr('class', 'fa fa-calendar-check-o');
+                    $("#modal-title").html('  Redimensionar');
+                    $("#modal-fields").attr('class', 'hidden');
+                    $("#modal-text").html('Tem certeza que deseja redimensionar a tarefa?');
+                    $("#modal-demiss").attr('onclick', 'window.location.reload();');
+                    $("#modal-exclude").attr('class', 'hidden');
+
+                    $('#submitButton').val('edit');
+                    $('#id_id').val(event.id);
+                    $('#id').val(event.id);
+                    $('#id_owner').val(event.owner);
+                    $('#id_subject').val(event.subject);
+                    $('#id_evaluation_type').val(event.evaluation_type);
+                    $('#id_title').val(event.title);
+                    $('#id_start').val(event.start);
+                    $('#id_end').val(event.end);
+                    $('#id_color').val(event.color);
+                    $('#id_description').val(event.description);
+                    $('#modal').modal('show');
+                },
+
+                eventDrop: function(event, delta, revertFunc) {
+                    $("#modal-icon").attr('class', 'fa fa-calendar-check-o');
+                    $("#modal-title").html('  Mudar');
+                    $("#modal-fields").attr('class', 'hidden');
+                    $("#modal-text").html('Tem certeza que deseja mudar a data da tarefa?');
+                    $("#modal-demiss").attr('onclick', 'window.location.reload();');
+                    $("#modal-exclude").attr('class', 'hidden');
+
+                    $('#submitButton').val('edit');
+                    $('#id_id').val(event.id);
+                    $('#id').val(event.id);
+                    $('#id_owner').val(event.owner);
+                    $('#id_subject').val(event.subject);
+                    $('#id_evaluation_type').val(event.evaluation_type);
+                    $('#id_title').val(event.title);
+                    $('#id_start').val(event.start);
+                    $('#id_end').val(event.end);
+                    $('#id_color').val(event.color);
+                    $('#id_description').val(event.description);
+                    $('#modal').modal('show');
+                },
+            })
+
+            $('#newSave').on('click', function (){
+                $("#modal-new").modal('hide');
+                if (($('#id_subject').val()) && ($('#evaluation_type').val()) && ($('#id_title').val())) {
+                    eventData = {
+                        owner: ($('#id_owner').val()),
+                        subject: ($('#id_subject').val()),
+                        evaluation_type: ($('#id_evaluation_type').val()),
+                        title: ($('#id_title').val()),
+                        start: ($('#id_start').val()),
+                        end: ($('#id_end').val()),
+                        color: ($('#id_color').val()),
+                        description: ($('#id_description').val()),
+                    };
+                }
+                $('#calendar').fullCalendar('renderEvent', eventData, true);
+            });
+        });
+
+        function titleDefine(){
+            selected = document.getElementById("id_subject");
+            subject = selected.options[selected.selectedIndex].text;
+            evaluation_type = document.getElementById("id_evaluation_type").value;
+            title = subject + ": " + evaluation_type;
+            document.getElementById('id_title').value=title;
+        }
+
+        function start_date_define(){
+            start = document.getElementById("id_start").value
+            start_date = new Date(start);
+            start_date.setDate(start_date.getDate() + 1);
+            start_date_final = $.datepicker.formatDate('yy-mm-dd', start_date);
+            document.getElementById("id_start_date").value = start_date_final
+
+            end = document.getElementById("id_end").value
+            end_date = new Date(end);
+            end_date_final = $.datepicker.formatDate('yy-mm-dd', end_date);
+            document.getElementById("id_end_date").value = end_date_final
+        }
+    </script>
+{% endblock %}

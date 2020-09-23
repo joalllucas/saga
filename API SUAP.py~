@@ -1,0 +1,27 @@
+#Gerar token para usuário:
+>>> import requests
+>>> import json
+>>> url = 'https://suap.ifrn.edu.br/api/v2/autenticacao/token/'
+>>> headers = {'content-type': 'application/json', 'Accept': 'application/json'}
+>>> data = {"username": "20131024010150","password": "senhasuap"}
+>>> response = requests.post(url, data=json.dumps(data), headers=headers)
+>>> token = response.json()['token']
+
+#Pegar dados do usuário:
+>>> import requests
+>>> import json
+>>> url = 'https://suap.ifrn.edu.br/api/v2/minhas-informacoes/meus-dados/'
+>>> headers = {'Authorization': 'JWT ' + token}
+>>> response = requests.get(url, headers=headers)
+>>> response.text
+>>> nome_usual = response.json()['nome_usual']
+
+#Pegar notas do usuário:
+>>> import requests
+>>> import json
+>>> year = str(2016)
+>>> period = str(1)
+>>> url = 'https://suap.ifrn.edu.br/api/v2/minhas-informacoes/boletim/' + year + '/' + period + '/'
+>>> headers = {'Authorization': 'JWT ' + token}
+>>> response = requests.get(url, headers=headers)
+>>> note_bio1  = response.json()[0]['nota_etapa_1']['nota'] #Biologia tem o index 0

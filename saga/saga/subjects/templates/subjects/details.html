@@ -1,0 +1,335 @@
+{% extends 'adminlte/base.html' %}
+
+{% block title %}SAGA | Disciplinas | {{ subject.name|truncatechars:40 }}{% endblock %}
+
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Confira os detalhes cadastrados na disciplina:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'subjects:index' %}">Disciplinas</a></li>
+            <li><a href="{{ subject.get_absolute_url }}">{{ subject.name|truncatechars:40 }}</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+{% if subject.final_evaluation %}
+<div class="modal modal fade" id="modal-final_evaluation">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa fa-pencil-square-o"></i> Avaliação final</h4>
+            </div>
+            <div class="modal-body">
+                Você precisa tirar <a class="badge bg-{{ subject.color }}">{{ subject.final_evaluation }}</a> pontos na prova final para ser aprovado na disciplina.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="modal modal-danger fade" id="modal-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="icon fa fa-warning"></i> Atenção!</h4>
+            </div>
+            <div class="modal-body">
+                <p>A ação não poderá ser desfeita. Deseja prosseguir com a exclusão da disciplina?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                <form enctype="multipart/form-data" action="" method="post" novalidate>
+                    {% csrf_token %}
+                    <button type="submit" value="Excluir" class="btn btn-outline">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+   <section class="content">
+        <div class="row">
+            <div class="box box-primary {% if is_valid %}collapsed-box{% endif %}">
+                <div class="box-header">
+                    <h3 class="box-title">Detalhes</h3>
+                    <div class="box-tools pull-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-wrench"></i></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{% url 'subjects:edit' subject.slug %}">Editar</a></li>
+                                <li><a data-toggle="modal" data-target="#modal-delete">Excluir</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="box-footer no-padding">
+                            <ul class="nav nav-stacked">
+                                <li><a>Disciplina: <span class="pull-right badge bg-{{ subject.color }}">{{ subject.name|truncatechars:30 }}</span></a></li>
+                                <li><a>Período: <span class="pull-right badge bg-{% if subject.period %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.period %}{{ subject.period }}{% else %}Não informado{% endif %}</span></a></li>
+                                <li><a>Professor: <span class="pull-right badge bg-{{ subject.color }}">{{ subject.teacher|truncatechars:30 }}</span></a></li>
+                                <li><a>Turma: <span class="pull-right badge bg-{{ subject.color }}">{{ subject.group }}</span></a></li>
+                                <li><a>Nível de interesse: <span class="pull-right badge bg-{{ subject.color }}">{{ subject.interest }}</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="box-footer no-padding">
+                            <ul class="nav nav-stacked">
+                                <li><a>Nota 01: <span class="pull-right badge bg-{% if subject.note1 and subject.note1 is not None or subject.note1 == 0 %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.note1 and subject.note1 is not None or subject.note1 == 0 %}{{ subject.note1 }}{% else %}Não informado{% endif %}</span></a></li>
+                                <li><a>Nota 02: <span class="pull-right badge bg-{% if subject.note2 and subject.note1 is not None or subject.note2 == 0 %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.note2 and subject.note2 is not None or subject.note2 == 0 %}{{ subject.note2 }}{% else %}Não informado{% endif %}</span></a></li>
+                                {% if subject.modality is False %}
+                                <li><a>Nota 03: <span class="pull-right badge bg-{% if subject.note3 and subject.note3 is not None or subject.note3 == 0 %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.note3 and subject.note3 is not None or subject.note3 == 0 %}{{ subject.note3 }}{% else %}Não informado{% endif %}</span></a></li>
+                                <li><a>Nota 04: <span class="pull-right badge bg-{% if subject.note4 and subject.note4 is not None or subject.note4 == 0 %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.note4 and subject.note4 is not None or subject.note4 == 0 %}{{ subject.note4 }}{% else %}Não informado{% endif %}</span></a></li>
+                                {% endif %}
+                                <li><a{% if subject.final_evaluation %} href="" data-toggle="modal" data-target="#modal-final_evaluation"{% endif %}>{% if subject.media and subject.media is not None or subject.media == 0 %}Média{% else %}Média parcial:{% endif %} <span class="pull-right badge bg-{% if subject.parcial_media is not None or subject.parcial_media == 0 %}{{ subject.color }}{% else %}gray{% endif %}">{% if subject.media and subject.media is not None or subject.media == 0 %}{{ subject.media }}{% else %}{% if subject.parcial_media is not None or subject.media == 0 %}{{ subject.parcial_media }}{% else %}Impossível calcular{% endif %}{% endif %}</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% if subject.observations %}
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="box-footer no-padding">
+                            <ul class="nav nav-stacked">
+                                <li><a>Observações:<br>{{ subject.observations|linebreaks }}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="box-body pad table-responsive">
+                    {% if 'm..' in subject.schedule %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="10%">Matutino</th>
+                                <th width="10%"><center>Domingo</center></th>
+                                <th width="10%"><center>Segunda</center></th>
+                                <th width="10%"><center>Terça</center></th>
+                                <th width="10%"><center>Quarta</center></th>
+                                <th width="10%"><center>Quinta</center></th>
+                                <th width="10%"><center>Sexta</center></th>
+                                <th width="10%"><center>Sábado</center></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td><strong>07:00 - 07:45</strong></td>
+                                <td align="center">{% if 'm..sun.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>07:45 - 08:30</strong></td>
+                                <td align="center">{% if 'm..sun.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>08:50 - 09:35</strong></td>
+                                <td align="center">{% if 'm..sun.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>09:35 - 10:20</strong></td>
+                                <td align="center">{% if 'm..sun.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>10:30 - 11:15</strong></td>
+                                <td align="center">{% if 'm..sun.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11:15 - 12:00</strong></td>
+                                <td align="center">{% if 'm..sun.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..mon.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..tue.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..wed.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..thu.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..fri.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'm..sat.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    {% if 'v..' in subject.schedule %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="10%">Vespertino</th>
+                                <th width="10%"><center>Domingo</center></th>
+                                <th width="10%"><center>Segunda</center></th>
+                                <th width="10%"><center>Terça</center></th>
+                                <th width="10%"><center>Quarta</center></th>
+                                <th width="10%"><center>Quinta</center></th>
+                                <th width="10%"><center>Sexta</center></th>
+                                <th width="10%"><center>Sábado</center></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td><strong>13:00 - 13:45</strong></td>
+                                <td align="center">{% if 'v..sun.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>13:45 - 14:30</strong></td>
+                                <td align="center">{% if 'v..sun.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>14:50 - 15:35</strong></td>
+                                <td align="center">{% if 'v..sun.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>15:35 - 16:20</strong></td>
+                                <td align="center">{% if 'v..sun.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>16:30 - 17:15</strong></td>
+                                <td align="center">{% if 'v..sun.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.5' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>17:15 - 18:00</strong></td>
+                                <td align="center">{% if 'v..sun.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..mon.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..tue.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..wed.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..thu.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..fri.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'v..sat.6' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    {% if 'n..' in subject.schedule %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="10%">Noturno</th>
+                                <th width="10%"><center>Domingo</center></th>
+                                <th width="10%"><center>Segunda</center></th>
+                                <th width="10%"><center>Terça</center></th>
+                                <th width="10%"><center>Quarta</center></th>
+                                <th width="10%"><center>Quinta</center></th>
+                                <th width="10%"><center>Sexta</center></th>
+                                <th width="10%"><center>Sábado</center></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td><strong>19:00 - 19:45</strong></td>
+                                <td align="center">{% if 'n..sun.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..mon.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..tue.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..wed.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..thu.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..fri.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..sat.1' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>19:45 - 20:30</strong></td>
+                                <td align="center">{% if 'n..sun.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..mon.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..tue.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..wed.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..thu.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..fri.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..sat.2' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>20:40 - 21:25</strong></td>
+                                <td align="center">{% if 'n..sun.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..mon.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..tue.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..wed.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..thu.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..fri.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..sat.3' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>21:25 - 22:10</strong></td>
+                                <td align="center">{% if 'n..sun.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..mon.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..tue.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..wed.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..thu.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..fri.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                                <td align="center">{% if 'n..sat.4' in subject.schedule %}<a  class="text-{{ subject.color }}"><i class="fa fa-circle"></i></a>{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+   </section>
+{% endblock %}

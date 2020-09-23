@@ -1,0 +1,202 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Conta | Editar{% endblock %}
+
+{% block extra_head %}
+<script>
+    window.onload = function error(){
+        document.getElementById('username').value = document.getElementById('id_username').value;
+        document.getElementById('email').value = document.getElementById('id_email').value;
+        document.getElementById('first_name').value = document.getElementById('id_first_name').value;
+        document.getElementById('last_name').value = document.getElementById('id_last_name').value;
+        document.getElementById('course').value = document.getElementById('id_course').value;
+        document.getElementById('group').value = document.getElementById('id_group').value;
+        document.getElementById('period').value = document.getElementById('id_period').value;
+        document.getElementById('ira').value = document.getElementById('id_ira').value;
+        document.getElementById('study_time_diary').value = document.getElementById('id_study_time_diary').value;
+    }
+</script>
+{% endblock %}
+
+{% block content_header %}
+
+    <div class="modal modal fade" id="modal-image">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-picture-o"></i> Editar imagem</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="" id="image" style="max-width: 100%;"><br>
+                    <button type="button" class="btn btn-default js-zoom-in">
+                        <span class="glyphicon glyphicon-zoom-in"></span>
+                    </button>
+                    <button type="button" class="btn btn-default js-zoom-out">
+                        <span class="glyphicon glyphicon-zoom-out"></span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary js-crop-and-upload">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Edite as informações cadastradas na sua conta:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'accounts:account' %}">Conta</a></li>
+            <li><a href="{% url 'accounts:edit' %}">Editar</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <div style="display: none;">
+        {% for field in form %}
+            {{ field }}
+        {% endfor %}
+    </div>
+   <section class="content">
+        <div class="row">
+            {% if success %}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Sucesso!</h4>
+                A conta foi editada com sucesso. Cheque seus dados em sua <a href="{% url 'accounts:account' %}">página</a>.
+            </div>
+            {% endif %}
+            {% if success == False %}
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h4><i class="icon fa fa-ban"></i> Ops...</h4>
+                Algumas informações não puderam ser salvas. Corrija os erros e tente novamente:<br><br>
+                {% for field in form %}
+                    {% if field.errors %}
+                        {{ field.label_tag }}
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="box box-primary">
+                <div class="box-body">
+                    <form enctype="multipart/form-data" action="" method="post" id="image_form" novalidate>
+                        {% csrf_token %}
+                        <div style="display: none;">
+                            {{ image_form.x }}{{ image_form.y }}{{ image_form.width }}{{ image_form.height }}
+                            <input type="text" name="button" value="save_image">
+                            <input type="file" name="image" id="id_image">
+                        </div>
+                        <div class="col-md-2">
+                            <center><img class="img-circle" src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'images/user.jpeg' %}{% endif %}" class="img-responsive" alt="Imagem de {% firstof request.user.first_name request.user.username %}" style="margin: 0 auto; width: 80%" /></center>
+                            <center><label for="id_image" class="badge bg-light-blue" style="cursor: pointer;">Editar imagem</a></center><br>
+                        </div>
+                    </form>
+                    <form enctype="multipart/form-data" action="" method="post" id="user_form" novalidate>
+                        {% csrf_token %}
+                        <div class="col-md-4 col-sm-6 col-xs-12">
+                            <input id="first_name" class="form-control" type="text" name="first_name" placeholder="Nome"/><br>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <input id="last_name" class="form-control" type="text" name="last_name" placeholder="Sbrenome"/><br>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <input id="email" class="form-control" type="text" name="email" placeholder="E-mail"/><br>
+                        </div>
+                        <div class="col-md-2 col-sm-6 col-xs-12">
+                            <input id="username" class="form-control" type="text" name="username" readonly/><br>
+                        </div>
+                        <div class="col-md-2 col-sm-6 col-xs-12">
+                            <input id="course" class="form-control" type="text" name="course" placeholder="Curso"/><br>
+                        </div>
+                        <div class="col-md-1 col-sm-6 col-xs-12">
+                            <input id="period" class="form-control" type="number" name="period" placeholder="Período"/><br>
+                        </div>
+                        <div class="col-md-2 col-sm-6 col-xs-12">
+                            <input id="group" class="form-control" type="text" name="group" placeholder="Turma"/><br>
+                        </div>
+                        <div class="col-md-2 col-sm-6 col-xs-12">
+                            <input id="ira" class="form-control" type="number" name="ira" placeholder="IRA"/><br>
+                        </div>
+                        <div class="col-md-1 col-sm-6 col-xs-12">
+                            <input id="study_time_diary" class="form-control" type="number" name="study_time_diary" placeholder="Tempo de estudo diário"/><br>
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-xs-4">
+                            <button style="width: 80px" class="btn btn-block btn-primary" type="submit" value="save" name="button">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+   </section>
+{% endblock %}
+
+{% block extra_foot %}
+    <link href="{% static 'cropper/dist/cropper.min.css' %}" rel="stylesheet">
+    <script src="{% static 'cropper/dist/cropper.min.js' %}"></script>
+    <script>
+    $(function () {
+        $("#id_image").change(function () {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#image").attr("src", e.target.result);
+                $("#modal-image").modal("show");
+               }
+            reader.readAsDataURL(this.files[0]);
+        }
+        });
+
+        var $image = $("#image");
+        var cropBoxData;
+        var canvasData;
+        $("#modal-image").on("shown.bs.modal", function () {
+            $image.cropper({
+            viewMode: 1,
+            aspectRatio: 1/1,
+            minCropBoxWidth: 200,
+            minCropBoxHeight: 200,
+            ready: function () {
+                $image.cropper("setCanvasData", canvasData);
+                $image.cropper("setCropBoxData", cropBoxData);
+            }
+        });
+
+        }).on("hidden.bs.modal", function () {
+            cropBoxData = $image.cropper("getCropBoxData");
+            canvasData = $image.cropper("getCanvasData");
+            $image.cropper("destroy");
+        });
+
+        $(".js-zoom-in").click(function () {
+            $image.cropper("zoom", 0.1);
+        });
+
+        $(".js-zoom-out").click(function () {
+            $image.cropper("zoom", -0.1);
+        });
+
+        $(".js-crop-and-upload").click(function () {
+            var cropData = $image.cropper("getData");
+            $("#id_x").val(cropData["x"]);
+            $("#id_y").val(cropData["y"]);
+            $("#id_height").val(cropData["height"]);
+            $("#id_width").val(cropData["width"]);
+            $("#image_form").submit();
+        });
+    });
+    </script>
+{% endblock %}

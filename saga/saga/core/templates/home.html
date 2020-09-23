@@ -1,0 +1,224 @@
+{% extends 'adminlte/base.html' %}
+
+{% block title %}SAGA | Início{% endblock %}
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block page_name %}Bem vindo ao SAGA!{% endblock %}
+            {% block no_description %}
+            <small>{% block page_description %}Confira os dados de hoje:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+                <li><a href="{% url 'core:home' %}">Início</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+</body>
+{% block content %}
+    {% for daily_progress in daily_progresses %}
+    <div class="modal modal fade" id="modal-progress-{{ daily_progress.slug }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-line-chart"></i> Progresso diário de {{ daily_progress.name }}</h4>
+                </div>
+                <form enctype="multipart/form-data" action="" method="post" id="subject_form" novalidate>
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <tr>
+                            <input type="number" step="any" style="width: 100px" value="{{ daily_progress.daily_progress|floatformat:"f" }}" name="daily_progress_{{ daily_progress.slug }}"> de {{ daily_progress.daily_goal|floatformat }} horas estudadas: <span class="badge bg-red">{% widthratio daily_progress.daily_progress daily_progress.daily_goal 100 %}%</span><br><br>
+                            <td>
+                                <div class="progress progress-xs progress-striped active">
+                                    <div class="progress-bar progress-bar" style="width: {% widthratio daily_progress.daily_progress daily_progress.daily_goal 100 %}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                        <button type="submit" id="button" name="button" value="{{ daily_progress.slug }}" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% for week_task in week_tasks %}
+    <div class="modal modal fade" id="modal-evaluation-{{ week_task.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="icon fa fa-pencil-square-o"></i> {{ week_task.title }}</h4>
+                </div>
+                <div class="modal-body">
+                    Disciplina: <span class="badge bg-{{ week_task.subject.color }}">{{ week_task.subject.name }}</span><br>
+                    Tipo: <span class="badge bg-{{ week_task.subject.color }}">{{ week_task.evaluation_type }}</span><br>
+                    Data: <span class="badge bg-{{ week_task.subject.color }}">{{ week_task.start_date|date:"d/m/y" }}</span>{% ifnotequal week_task.start_date week_task.end_date %} a <span class="badge bg-{{ week_task.subject.color }}">{{ week_task.end_date|date:"d/m/y" }}</span>{% endifnotequal %}<br>
+                    {% if week_task.description %}
+                    Descrição:
+                    <ul>
+                        {{ week_task.description|linebreaks }}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-line-chart"></i></span>
+                <div class="info-box-content">
+                    <a class="info-box-text" href="#progresso-diario">Progresso diário</a>
+                    <span class="info-box-number">{% if daily_progresses_value %}{{ daily_total }}%{% else %}Sem registro{% endif %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-clock-o"></i></span>
+                <div class="info-box-content">
+                    <a class="info-box-text" href="#progresso-diario">Estudo diário</a>
+                    <span class="info-box-number">{% if daily_progresses_value %}{{ daily_total_hours|floatformat }} hora{% if daily_total_hours >= 2 %}s{% endif %}{% else %}Sem registro{% endif %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-pencil-square-o"></i></span>
+                <div class="info-box-content">
+                    <a class="info-box-text" href="#avaliacoes-da-semana">Avaliações na semana</a>
+                    <span class="info-box-number">{{ week_tasks_value }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-exclamation-triangle"></i></span>
+                <div class="info-box-content">
+                    <a class="info-box-text" href="#disciplinas-criticas">Disciplinas críticas</a>
+                    <span class="info-box-number">{{ critical }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary {% if not daily_progresses_value %}collapsed-box{% endif %}" id="progresso-diario">
+        <div class="box-header">
+            <h3 class="box-title">Progresso diário</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-{% if daily_progresses_value %}minus{% else %}plus{% endif %}"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body pad table-responsive">
+            {% if daily_progresses_value %}
+            <table class="table table-condensed table-hover">
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Progresso</th>
+                    <th style="width: 40px">%</th>
+                </tr>
+                {% for daily_progress in daily_progresses %}
+                <tr>
+                    <td>{{ daily_progress.name }}</td>
+                    <td>
+                        <div class="progress progress-xs progress-striped active">
+                            <div class="progress-bar progress-bar" style="width: {% widthratio daily_progress.daily_progress daily_progress.daily_goal 100 %}%"></div>
+                        </div>
+                    </td>
+                    <td><a class="badge bg-{{ daily_progress.color }}" data-toggle="modal" data-target="#modal-progress-{{ daily_progress.slug }}">{% widthratio daily_progress.daily_progress daily_progress.daily_goal 100 %}%</a></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td>
+                        <div class="progress progress-xs progress-striped active">
+                            <div class="progress-bar progress-bar" style="width: {{ daily_total }}%"></div>
+                        </div>
+                    </td>
+                        <td><span class="badge bg-light-blue">{{ daily_total }}%</span></td>
+                </tr>
+            </table>
+            {% else %}
+            <center><b>Você não possui disciplinas para estudar hoje. Aproveite o tempo livre e aprenda alguma coisa nova!</b></center>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="box box-primary {% if not week_tasks_value %}collapsed-box{% endif %}" id="avaliacoes-da-semana">
+        <div class="box-header">
+            <h3 class="box-title">Avaliações na semana</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-{% if week_tasks_value %}minus{% else %}plus{% endif %}"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body pad table-responsive">
+            {% if week_tasks_value %}
+            <table class="table table-condensed table-hover">
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Tipo</th>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th style="width: 30px"></th>
+                </tr>
+                {% for week_task in week_tasks %}
+                <tr>
+                    <td>{{ week_task.subject.name }}</td>
+                    <td>{{ week_task.evaluation_type }}</td>
+                    <td>{{ week_task.start_date|date:"l (d)" }}{% ifnotequal week_task.start_date week_task.end_date %} a {{ week_task.end_date|date:"l (d)" }}{% endifnotequal %}</td>
+                    <td>{% if week_task.description %}{{ week_task.description|truncatechars:50 }}{% endif %}</td>
+                    <td><a class="badge bg-{{ week_task.subject.color }}" data-toggle="modal" data-target="#modal-evaluation-{{ week_task.id }}"></li>+</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <center><b>Você não possui avaliações nesta semana.</b></center>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="box box-primary {% if not critical %}collapsed-box{% endif %}" id="disciplinas-criticas">
+        <div class="box-header">
+            <h3 class="box-title">Disciplinas críticas</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-{% if critical %}minus{% else %}plus{% endif %}"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body pad table-responsive">
+            {% if critical %}
+            <table class="table table-condensed table-hover">
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Média parcial</th>
+                    <th style="width: 150px">Nível de criticidade</th>
+                </tr>
+                {% for subject in subjects %}
+                {% if subject.parcial_media < 60 %}
+                <tr>
+                    <td>{{ subject.name }}</td>
+                    <td>{{ subject.parcial_media }}</td>
+                    <td><a href="{{ subject.get_absolute_url }}" class="badge bg-{% if subject.parcial_media < 60 and subject.parcial_media >= 40 %}green{% endif %}{% if subject.parcial_media < 40 and subject.parcial_media >= 20 %}yellow{% endif %}{% if subject.parcial_media < 20 %}red{% endif %}">{% if subject.parcial_media < 60 and subject.parcial_media >= 40 %}Pouco crítico{% endif %}{% if subject.parcial_media < 40 and subject.parcial_media >= 20 %}Crítico{% endif %}{% if subject.parcial_media < 20 %}Muito crítico{% endif %}</a></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                </table>
+            {% else %}
+            <center><b>Você não possui disciplinas em estado crítico.</b></center>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

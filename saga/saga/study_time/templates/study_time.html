@@ -1,0 +1,86 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}SAGA | Horário de Estudo{% endblock %}
+
+{% block content_header %}
+    <section class="content-header">
+        <h1>
+            {% block no_description %}
+            <small>{% block page_description %}Confira o seu horário de estudo:{% endblock %}</small>
+            {% endblock %}
+        </h1>
+        <ol class="breadcrumb">
+        {% block breadcrumbs %}
+            <li><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'study_time:study_time' %}">Horário de Estudo</a></li>
+        {% endblock %}
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+    {% for week_study in week_studies %}
+        {% for task in tasks %}
+            {% if task.subject.id == week_study.id %}
+<div class="modal modal fade" id="modal-{{ week_study.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa fa-clock-o"></i> Tarefas de {{ week_study.name }}</h4>
+            </div>
+            <div class="modal-body">
+                Confira as tarefas na semana:
+                    <ul>
+                        {% for task in tasks %}
+                            {% if task.subject.id == week_study.id %}
+                        <li><a class="badge bg-{{ week_study.color }}">{{ task.evaluation_type }}</a>, {% ifnotequal task.start_date task.end_date %}d{% else %}n{% endifnotequal %}o dia <a class="badge bg-{{ week_study.color }}">{{ task.start_date|date:"d (l)" }}</a>{% ifnotequal task.start_date task.end_date %} ao dia <a class="badge bg-{{ week_study.color }}">{{ task.end_date|date:"d (l)" }}</a>{% endifnotequal %}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+    <section class="content">
+        <div class="row">
+            <div class="box box-primary">
+                <div class="box-body pad table-responsive">
+                    <table class="table table-bordered">
+                            <thead>
+                                    <th width="10%"><center>Domingo</center></th>
+                                    <th width="10%"><center>Segunda</center></th>
+                                    <th width="10%"><center>Terça</center></th>
+                                    <th width="10%"><center>Quarta</center></th>
+                                    <th width="10%"><center>Quinta</center></th>
+                                    <th width="10%"><center>Sexta</center></th>
+                                    <th width="10%"><center>Sábado</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td align="center">{% for sun_study in sun_studies %}<a  class="badge bg-{{ sun_study.color }}" data-toggle="modal" data-target="#modal-{{ sun_study.id }}">{{ sun_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for mon_study in mon_studies %}<a  class="badge bg-{{ mon_study.color }}" data-toggle="modal" data-target="#modal-{{ mon_study.id }}">{{ mon_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for tue_study in tue_studies %}<a  class="badge bg-{{ tue_study.color }}" data-toggle="modal" data-target="#modal-{{ tue_study.id }}">{{ tue_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for wed_study in wed_studies %}<a  class="badge bg-{{ wed_study.color }}" data-toggle="modal" data-target="#modal-{{ wed_study.id }}">{{ wed_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for thu_study in thu_studies %}<a  class="badge bg-{{ thu_study.color }}" data-toggle="modal" data-target="#modal-{{ thu_study.id }}">{{ thu_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for fri_study in fri_studies %}<a  class="badge bg-{{ fri_study.color }}" data-toggle="modal" data-target="#modal-{{ fri_study.id }}">{{ fri_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    <td align="center">{% for sat_study in sat_studies %}<a  class="badge bg-{{ sat_study.color }}" data-toggle="modal" data-target="#modal-{{ sat_study.id }}">{{ sat_study.name|truncatechars:10 }}</a><br>{% endfor %}</td>
+                                    {{ date }}
+                                </tr>
+
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
